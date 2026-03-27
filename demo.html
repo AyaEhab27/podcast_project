@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PodCraft AI - استوديو الشخصيات الصوتية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0f, #1a1a2e);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .personas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .persona-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .persona-card:hover {
+            border-color: #3b82f6;
+        }
+
+        .persona-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .persona-badge {
+            background: rgba(59, 130, 246, 0.3);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        select option {
+            background: #1a1a2e;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .voice-info-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .voice-info-panel .voice-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .voice-info-panel .voice-details {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .voice-tag {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        .voice-en {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .voice-ar {
+            background: rgba(34, 197, 94, 0.3);
+        }
+
+        .style-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .style-btn {
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .style-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: transparent;
+        }
+
+        .gender-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 0.6rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .gender-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: transparent;
+        }
+
+        .language-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .lang-btn {
+            flex: 1;
+            padding: 0.6rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: transparent;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .speed-control input {
+            flex: 1;
+        }
+
+        .speed-value {
+            min-width: 45px;
+            text-align: center;
+            background: rgba(59, 130, 246, 0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+        }
+
+        .preview-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+
+        .preview-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .audio-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .audio-preview.show {
+            display: block;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #3b82f6;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .script-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .script-section textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            min-height: 120px;
+            margin-bottom: 1rem;
+        }
+
+        .generate-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .generate-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .personas-grid {
+                grid-template-columns: 1fr;
+            }
+            .generate-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ PodCraft AI - استوديو الشخصيات الصوتية</h1>
+
+        <div class="personas-grid">
+            <!-- HOST Card -->
+            <div class="persona-card">
+                <div class="persona-header">
+                    <h2>🎙️ HOST</h2>
+                    <div class="persona-badge">مقدم البودكاست</div>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 اختيار صوت</label>
+                    <select id="host-voice-select" onchange="loadVoiceProperties('host')">
+                        <option value="">-- اختر صوت --</option>
+                        <optgroup label="🇺🇸 English Voices (ElevenLabs)">
+                            <option value="adam">Adam - رجالي احترافي</option>
+                            <option value="sarah">Sarah - ست احترافي</option>
+                            <option value="george">George - رجالي دافيء</option>
+                            <option value="alice">Alice - ست واضح</option>
+                            <option value="charlie">Charlie - رجالي نشيط</option>
+                            <option value="bella">Bella - ست دافيء</option>
+                        </optgroup>
+                        <optgroup label="🇪🇬 Arabic Voices (gTTS - مجاني)">
+                            <option value="arabic_male">عربي رجالي</option>
+                            <option value="arabic_female">عربي ست</option>
+                            <option value="child_male">طفل رجالي</option>
+                            <option value="child_female">طفلة ست</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- عرض معلومات الصوت -->
+                <div id="host-voice-info" class="voice-info-panel" style="display: none;">
+                    <div class="voice-name" id="host-voice-name"></div>
+                    <div class="voice-details" id="host-voice-details"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 اسم الشخصية</label>
+                    <input type="text" id="host-name" placeholder="أدخل اسم الشخصية" value="Adam">
+                </div>
+
+                <div class="form-group">
+                    <label>🎨 ستايل الصوت</label>
+                    <div class="style-buttons" id="host-styles">
+                        <div class="style-btn" data-style="professional">احترافي</div>
+                        <div class="style-btn active" data-style="energetic">نشيط</div>
+                        <div class="style-btn" data-style="calm">هادئ</div>
+                        <div class="style-btn" data-style="warm">دافيء</div>
+                        <div class="style-btn" data-style="clear">واضح</div>
+                    </div>
+                    <input type="hidden" id="host-style" value="professional">
+                </div>
+
+                <div class="form-group">
+                    <label>👤 الجنس</label>
+                    <div class="gender-buttons" id="host-gender-buttons">
+                        <div class="gender-btn active" data-gender="male">👨 راجل</div>
+                        <div class="gender-btn" data-gender="female">👩 ست</div>
+                    </div>
+                    <input type="hidden" id="host-gender" value="male">
+                </div>
+
+                <div class="form-group">
+                    <label>🌐 اللغة</label>
+                    <div class="language-buttons" id="host-language-buttons">
+                        <div class="lang-btn" data-lang="ar-eg">🇪🇬 عربي</div>
+                        <div class="lang-btn active" data-lang="en">🇺🇸 English</div>
+                    </div>
+                    <input type="hidden" id="host-language" value="en">
+                </div>
+
+                <div class="form-group">
+                    <label>📏 العمر</label>
+                    <div class="gender-buttons" id="host-age-buttons">
+                        <div class="gender-btn active" data-age="adult">👨 كبير</div>
+                        <div class="gender-btn" data-age="child">🧒 طفل</div>
+                    </div>
+                    <input type="hidden" id="host-age" value="adult">
+                </div>
+
+                <div class="form-group">
+                    <label>⚡ سرعة الصوت</label>
+                    <div class="speed-control">
+                        <span>🐢 0.5x</span>
+                        <input type="range" id="host-speed" min="0.5" max="2.0" step="0.05" value="1.0">
+                        <span id="host-speed-value" class="speed-value">1.0x</span>
+                        <span>🐇 2.0x</span>
+                    </div>
+                </div>
+
+                <button class="preview-btn" onclick="previewVoice('host')">🔊 Preview Voice</button>
+                <div id="host-preview" class="audio-preview">
+                    <audio id="host-audio" controls></audio>
+                    <div id="host-status" class="status"></div>
+                </div>
+                <div id="host-loading" class="loading">🔄 جاري التوليد...</div>
+            </div>
+
+            <!-- GUEST Card -->
+            <div class="persona-card">
+                <div class="persona-header">
+                    <h2>👤 GUEST</h2>
+                    <div class="persona-badge">ضيف البودكاست</div>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 اختيار صوت</label>
+                    <select id="guest-voice-select" onchange="loadVoiceProperties('guest')">
+                        <option value="">-- اختر صوت --</option>
+                        <optgroup label="🇺🇸 English Voices (ElevenLabs)">
+                            <option value="adam">Adam - رجالي احترافي</option>
+                            <option value="sarah">Sarah - ست احترافي</option>
+                            <option value="george">George - رجالي دافيء</option>
+                            <option value="alice">Alice - ست واضح</option>
+                            <option value="charlie">Charlie - رجالي نشيط</option>
+                            <option value="bella">Bella - ست دافيء</option>
+                        </optgroup>
+                        <optgroup label="🇪🇬 Arabic Voices (gTTS - مجاني)">
+                            <option value="arabic_male">عربي رجالي</option>
+                            <option value="arabic_female">عربي ست</option>
+                            <option value="child_male">طفل رجالي</option>
+                            <option value="child_female">طفلة ست</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- عرض معلومات الصوت -->
+                <div id="guest-voice-info" class="voice-info-panel" style="display: none;">
+                    <div class="voice-name" id="guest-voice-name"></div>
+                    <div class="voice-details" id="guest-voice-details"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 اسم الشخصية</label>
+                    <input type="text" id="guest-name" placeholder="أدخل اسم الشخصية" value="Sarah">
+                </div>
+
+                <div class="form-group">
+                    <label>🎨 ستايل الصوت</label>
+                    <div class="style-buttons" id="guest-styles">
+                        <div class="style-btn" data-style="professional">احترافي</div>
+                        <div class="style-btn active" data-style="warm">دافيء</div>
+                        <div class="style-btn" data-style="calm">هادئ</div>
+                        <div class="style-btn" data-style="energetic">نشيط</div>
+                        <div class="style-btn" data-style="clear">واضح</div>
+                    </div>
+                    <input type="hidden" id="guest-style" value="professional">
+                </div>
+
+                <div class="form-group">
+                    <label>👤 الجنس</label>
+                    <div class="gender-buttons" id="guest-gender-buttons">
+                        <div class="gender-btn" data-gender="male">👨 راجل</div>
+                        <div class="gender-btn active" data-gender="female">👩 ست</div>
+                    </div>
+                    <input type="hidden" id="guest-gender" value="female">
+                </div>
+
+                <div class="form-group">
+                    <label>🌐 اللغة</label>
+                    <div class="language-buttons" id="guest-language-buttons">
+                        <div class="lang-btn" data-lang="ar-eg">🇪🇬 عربي</div>
+                        <div class="lang-btn active" data-lang="en">🇺🇸 English</div>
+                    </div>
+                    <input type="hidden" id="guest-language" value="en">
+                </div>
+
+                <div class="form-group">
+                    <label>📏 العمر</label>
+                    <div class="gender-buttons" id="guest-age-buttons">
+                        <div class="gender-btn active" data-age="adult">👨 كبير</div>
+                        <div class="gender-btn" data-age="child">🧒 طفل</div>
+                    </div>
+                    <input type="hidden" id="guest-age" value="adult">
+                </div>
+
+                <div class="form-group">
+                    <label>⚡ سرعة الصوت</label>
+                    <div class="speed-control">
+                        <span>🐢 0.5x</span>
+                        <input type="range" id="guest-speed" min="0.5" max="2.0" step="0.05" value="1.0">
+                        <span id="guest-speed-value" class="speed-value">1.0x</span>
+                        <span>🐇 2.0x</span>
+                    </div>
+                </div>
+
+                <button class="preview-btn" onclick="previewVoice('guest')">🔊 Preview Voice</button>
+                <div id="guest-preview" class="audio-preview">
+                    <audio id="guest-audio" controls></audio>
+                    <div id="guest-status" class="status"></div>
+                </div>
+                <div id="guest-loading" class="loading">🔄 جاري التوليد...</div>
+            </div>
+        </div>
+
+        <!-- Script Section -->
+        <div class="script-section">
+            <h3>📝 النص</h3>
+            <textarea id="script-text" rows="4">Hello and welcome to PodCraft AI podcast! Today we're talking about artificial intelligence and its impact on our daily lives.</textarea>
+            
+            <div class="generate-buttons">
+                <button class="generate-btn" onclick="generateAudio('host')">🎙️ توليد صوت المذيع (Host)</button>
+                <button class="generate-btn" onclick="generateAudio('guest')">👤 توليد صوت الضيف (Guest)</button>
+            </div>
+
+            <div id="generated-result" class="result">
+                <h4>🎧 الصوت المنتج:</h4>
+                <audio id="generated-audio" controls></audio>
+                <div id="generated-info" class="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000';
+        
+        // تعريف الأصوات الـ 10 بالكامل مع خصائصها
+        const VOICES_DATA = {
+            'adam': {
+                name: 'Adam',
+                gender: 'male',
+                language: 'en',
+                style: 'professional',
+                age: 'adult',
+                description: 'رجالي - احترافي، قوي',
+                voice_id: 'pNInz6obpgDQGcFmaJgB',
+                preview_text: 'Hello, I am Adam'
+            },
+            'sarah': {
+                name: 'Sarah',
+                gender: 'female',
+                language: 'en',
+                style: 'professional',
+                age: 'adult',
+                description: 'ست - احترافي، واثق',
+                voice_id: 'EXAVITQu4vr4xnSDxMaL',
+                preview_text: 'Hello, I am Sarah'
+            },
+            'george': {
+                name: 'George',
+                gender: 'male',
+                language: 'en',
+                style: 'warm',
+                age: 'adult',
+                description: 'رجالي - دافيء، راوي قصص',
+                voice_id: 'JBFqnCBsd6RMkjVDRZzb',
+                preview_text: 'Hello, I am George'
+            },
+            'alice': {
+                name: 'Alice',
+                gender: 'female',
+                language: 'en',
+                style: 'clear',
+                age: 'adult',
+                description: 'ست - واضح، معلم',
+                voice_id: 'Xb7hH8MSUJpSbSDYk0k2',
+                preview_text: 'Hello, I am Alice'
+            },
+            'charlie': {
+                name: 'Charlie',
+                gender: 'male',
+                language: 'en',
+                style: 'energetic',
+                age: 'adult',
+                description: 'رجالي - نشيط، قوي',
+                voice_id: 'IKne3meq5aSn9XLyUdCD',
+                preview_text: 'Hello, I am Charlie'
+            },
+            'bella': {
+                name: 'Bella',
+                gender: 'female',
+                language: 'en',
+                style: 'warm',
+                age: 'adult',
+                description: 'ست - دافيء، مشرق',
+                voice_id: 'hpp4J3VqNfWAUOO0d1Us',
+                preview_text: 'Hello, I am Bella'
+            },
+            'arabic_male': {
+                name: 'Arabic Male',
+                gender: 'male',
+                language: 'ar',
+                style: 'natural',
+                age: 'adult',
+                description: 'عربي رجالي - طبيعي (gTTS)',
+                voice_id: 'arabic_male',
+                preview_text: 'مرحباً، أنا الصوت العربي الرجالي'
+            },
+            'arabic_female': {
+                name: 'Arabic Female',
+                gender: 'female',
+                language: 'ar',
+                style: 'natural',
+                age: 'adult',
+                description: 'عربي ست - طبيعي (gTTS)',
+                voice_id: 'arabic_female',
+                preview_text: 'مرحباً، أنا الصوت العربي الست'
+            },
+            'child_male': {
+                name: 'Child Male',
+                gender: 'male',
+                language: 'ar',
+                style: 'natural',
+                age: 'child',
+                description: 'طفل رجالي (gTTS)',
+                voice_id: 'child_male',
+                preview_text: 'مرحباً، أنا صوت طفل'
+            },
+            'child_female': {
+                name: 'Child Female',
+                gender: 'female',
+                language: 'ar',
+                style: 'natural',
+                age: 'child',
+                description: 'طفلة ست (gTTS)',
+                voice_id: 'child_female',
+                preview_text: 'مرحباً، أنا صوت طفلة'
+            }
+        };
+        
+        // تحميل خصائص الصوت عند اختياره
+        function loadVoiceProperties(type) {
+            const selectId = `${type}-voice-select`;
+            const voiceKey = document.getElementById(selectId).value;
+            
+            if (!voiceKey || !VOICES_DATA[voiceKey]) {
+                document.getElementById(`${type}-voice-info`).style.display = 'none';
+                return;
+            }
+            
+            const voice = VOICES_DATA[voiceKey];
+            
+            // عرض معلومات الصوت
+            const infoDiv = document.getElementById(`${type}-voice-info`);
+            const nameSpan = document.getElementById(`${type}-voice-name`);
+            const detailsSpan = document.getElementById(`${type}-voice-details`);
+            
+            nameSpan.innerHTML = `${voice.name} ${voice.language === 'en' ? '🇺🇸' : '🇪🇬'}`;
+            detailsSpan.innerHTML = `
+                <span class="voice-tag ${voice.language === 'en' ? 'voice-en' : 'voice-ar'}">${voice.description}</span>
+                <span>🎨 ${voice.style === 'professional' ? 'احترافي' : voice.style === 'energetic' ? 'نشيط' : voice.style === 'calm' ? 'هادئ' : voice.style === 'warm' ? 'دافيء' : voice.style === 'clear' ? 'واضح' : voice.style}</span>
+                <span>👤 ${voice.gender === 'male' ? 'راجل' : 'ست'}</span>
+                <span>📏 ${voice.age === 'child' ? 'طفل' : 'كبير'}</span>
+            `;
+            infoDiv.style.display = 'block';
+            
+            // تعيين الخصائص في الواجهة
+            document.getElementById(`${type}-name`).value = voice.name;
+            document.getElementById(`${type}-style`).value = voice.style;
+            document.getElementById(`${type}-gender`).value = voice.gender;
+            document.getElementById(`${type}-language`).value = voice.language;
+            document.getElementById(`${type}-age`).value = voice.age;
+            
+            // تحديث الأزرار
+            updateStyleButtons(type, voice.style);
+            updateGenderButtons(type, voice.gender);
+            updateLanguageButtons(type, voice.language);
+            updateAgeButtons(type, voice.age);
+            
+            // حفظ نص المعاينة في الـ dataset
+            document.getElementById(`${type}-voice-select`).dataset.previewText = voice.preview_text;
+        }
+        
+        function updateStyleButtons(type, style) {
+            const container = document.getElementById(`${type}-styles`);
+            container.querySelectorAll('.style-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.style === style) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        function updateGenderButtons(type, gender) {
+            const container = document.getElementById(`${type}-gender-buttons`);
+            container.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.gender === gender) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        function updateLanguageButtons(type, language) {
+            const container = document.getElementById(`${type}-language-buttons`);
+            container.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.lang === language) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        function updateAgeButtons(type, age) {
+            const container = document.getElementById(`${type}-age-buttons`);
+            container.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.age === age) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        // تهيئة الأزرار
+        function initStyleButtons(containerId, inputId) {
+            const container = document.getElementById(containerId);
+            const input = document.getElementById(inputId);
+            
+            container.querySelectorAll('.style-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    input.value = btn.dataset.style;
+                });
+            });
+        }
+        
+        function initGenderButtons(containerId, inputId) {
+            const container = document.getElementById(containerId);
+            const input = document.getElementById(inputId);
+            
+            container.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    input.value = btn.dataset.gender;
+                });
+            });
+        }
+        
+        function initLanguageButtons(containerId, inputId) {
+            const container = document.getElementById(containerId);
+            const input = document.getElementById(inputId);
+            
+            container.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    input.value = btn.dataset.lang;
+                });
+            });
+        }
+        
+        function initAgeButtons(containerId, inputId) {
+            const container = document.getElementById(containerId);
+            const input = document.getElementById(inputId);
+            
+            container.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    input.value = btn.dataset.age;
+                });
+            });
+        }
+        
+        // تحديث عرض السرعة
+        document.getElementById('host-speed').addEventListener('input', function() {
+            document.getElementById('host-speed-value').textContent = this.value + 'x';
+        });
+        document.getElementById('guest-speed').addEventListener('input', function() {
+            document.getElementById('guest-speed-value').textContent = this.value + 'x';
+        });
+        
+        // تهيئة الأزرار
+        initStyleButtons('host-styles', 'host-style');
+        initStyleButtons('guest-styles', 'guest-style');
+        initGenderButtons('host-gender-buttons', 'host-gender');
+        initGenderButtons('guest-gender-buttons', 'guest-gender');
+        initLanguageButtons('host-language-buttons', 'host-language');
+        initLanguageButtons('guest-language-buttons', 'guest-language');
+        initAgeButtons('host-age-buttons', 'host-age');
+        initAgeButtons('guest-age-buttons', 'guest-age');
+        
+        // خريطة الستايلات للـ API
+        const styleMap = {
+            'professional': 'professional',
+            'energetic': 'energetic',
+            'calm': 'calm',
+            'warm': 'warm',
+            'clear': 'clear'
+        };
+        
+        // معاينة الصوت (باستخدام نص المعاينة المناسب للغة)
+        async function previewVoice(type) {
+            const selectId = `${type}-voice-select`;
+            const voiceKey = document.getElementById(selectId).value;
+            
+            // اختيار نص المعاينة حسب الصوت المختار
+            let text;
+            if (voiceKey && VOICES_DATA[voiceKey]) {
+                text = VOICES_DATA[voiceKey].preview_text;
+            } else {
+                // نص افتراضي حسب اللغة المختارة
+                const language = document.getElementById(`${type}-language`).value;
+                const name = document.getElementById(`${type}-name`).value;
+                text = language === 'en' ? `Hello, I am ${name}` : `مرحباً، أنا ${name}`;
+            }
+            
+            const styleInput = document.getElementById(`${type}-style`).value;
+            const style = styleMap[styleInput] || 'professional';
+            const speed = parseFloat(document.getElementById(`${type}-speed`).value);
+            const gender = document.getElementById(`${type}-gender`).value;
+            const language = document.getElementById(`${type}-language`).value;
+            const age = document.getElementById(`${type}-age`).value;
+            
+            const loading = document.getElementById(`${type}-loading`);
+            const previewDiv = document.getElementById(`${type}-preview`);
+            const audioPlayer = document.getElementById(`${type}-audio`);
+            const statusDiv = document.getElementById(`${type}-status`);
+            
+            loading.classList.add('show');
+            previewDiv.classList.remove('show');
+            
+            try {
+                const response = await fetch(`${API_URL}/generate-audio`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        persona: type === 'host' ? 'host' : 'guest',
+                        name: document.getElementById(`${type}-name`).value,
+                        language: language,
+                        gender: gender,
+                        age: age,
+                        style: style,
+                        speed: speed
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.audio_url) {
+                    audioPlayer.src = data.audio_url;
+                    previewDiv.classList.add('show');
+                    const langFlag = data.language === 'ar' ? '🇪🇬' : '🇺🇸';
+                    statusDiv.innerHTML = `✅ ${langFlag} ${data.voice} | سرعة: ${speed}x | المدة: ${data.duration?.toFixed(1) || '?'} ثانية`;
+                    audioPlayer.play();
+                } else {
+                    statusDiv.innerHTML = '❌ فشل: ' + (data.error || 'خطأ غير معروف');
+                    previewDiv.classList.add('show');
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML = '❌ لا يمكن الاتصال بالسيرفر';
+                previewDiv.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+        
+        // توليد الصوت الكامل
+        async function generateAudio(type) {
+            const text = document.getElementById('script-text').value;
+            if (!text.trim()) {
+                alert('❌ من فضلك اكتب نصاً');
+                return;
+            }
+            
+            const name = document.getElementById(`${type}-name`).value || (type === 'host' ? 'المذيع' : 'الضيف');
+            const styleInput = document.getElementById(`${type}-style`).value;
+            const style = styleMap[styleInput] || 'professional';
+            const speed = parseFloat(document.getElementById(`${type}-speed`).value);
+            const gender = document.getElementById(`${type}-gender`).value;
+            const language = document.getElementById(`${type}-language`).value;
+            const age = document.getElementById(`${type}-age`).value;
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '🔄 جاري التوليد...';
+            btn.disabled = true;
+            
+            const resultDiv = document.getElementById('generated-result');
+            const audioPlayer = document.getElementById('generated-audio');
+            const infoDiv = document.getElementById('generated-info');
+            
+            try {
+                const response = await fetch(`${API_URL}/generate-audio`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        persona: type === 'host' ? 'host' : 'guest',
+                        name: name,
+                        language: language,
+                        gender: gender,
+                        age: age,
+                        style: style,
+                        speed: speed
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.audio_url) {
+                    audioPlayer.src = data.audio_url;
+                    resultDiv.classList.add('show');
+                    const langFlag = data.language === 'ar' ? '🇪🇬' : '🇺🇸';
+                    infoDiv.innerHTML = `✅ ${langFlag} ${data.voice} | سرعة: ${speed}x | المدة: ${data.duration?.toFixed(1) || '?'} ثانية`;
+                    audioPlayer.play();
+                } else {
+                    alert('❌ فشل: ' + (data.error || 'خطأ غير معروف'));
+                }
+                
+            } catch (error) {
+                alert('❌ لا يمكن الاتصال بالسيرفر');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

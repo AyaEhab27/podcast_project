@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Create Podcast - PodCraft AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <div class="logo-icon">🎙️</div>
+                <h1>PodCraft AI</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="create.html" class="active">Create New</a></li>
+                <li><a href="dashboard.html?tab=personas">Personas</a></li>
+                <li><a href="dashboard.html?tab=library">My Library</a></li>
+                <li><a href="dashboard.html?tab=settings">Settings</a></li>
+            </ul>
+            <div class="nav-buttons" id="nav-buttons">
+                <button onclick="logout()" class="btn-outline">Logout</button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Create New Episode</h1>
+            <p>Describe your podcast goal and let our AI agents handle the rest</p>
+        </div>
+        
+        <div class="options-section" style="padding: 0 0 2rem 0;">
+            <div class="options-grid">
+                <div class="option-card" data-type="link">
+                    <div class="option-icon">🔗</div>
+                    <h3>From Link</h3>
+                    <p>Convert any article or webpage</p>
+                </div>
+                <div class="option-card" data-type="pdf">
+                    <div class="option-icon">📄</div>
+                    <h3>From PDF</h3>
+                    <p>Upload documents and reports</p>
+                </div>
+                <div class="option-card" data-type="text">
+                    <div class="option-icon">✍️</div>
+                    <h3>From Text</h3>
+                    <p>Paste your script or notes</p>
+                </div>
+                <div class="option-card" data-type="idea">
+                    <div class="option-icon">💡</div>
+                    <h3>Just an Idea</h3>
+                    <p>Describe what you want to talk about</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="create-podcast-form">
+            <form id="podcast-form">
+                <div class="form-row" id="content-input">
+                    <label for="content">Content / Idea</label>
+                    <textarea id="content" placeholder="Describe your podcast idea, paste a URL, or enter your content here..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <label for="topic">Podcast Title</label>
+                    <input type="text" id="topic" placeholder="Enter a title for your podcast" required>
+                </div>
+                
+                <div class="form-row voice-selector">
+                    <div class="voice-option">
+                        <label>🎙️ Host Voice</label>
+                        <select id="host-voice">
+                            <option value="male_host">James - Professional</option>
+                            <option value="female_host">Sarah - Friendly</option>
+                        </select>
+                    </div>
+                    <div class="voice-option">
+                        <label>👤 Guest Voice</label>
+                        <select id="guest-voice">
+                            <option value="male_guest">Michael - Casual</option>
+                            <option value="female_guest">Emma - Enthusiastic</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="generate-btn">🎙️ Generate Podcast</button>
+            </form>
+        </div>
+        
+        <div id="result-section" class="result-section" style="display: none;">
+            <h3>✨ Generated Podcast</h3>
+            <div id="generated-script"></div>
+            <div id="audio-player"></div>
+            <div style="margin-top: 1rem;">
+                <button onclick="savePodcast()" class="btn-primary">💾 Save to Library</button>
+                <button onclick="exportPodcast()" class="btn-outline">📤 Export</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/audio-agent.js"></script>
+    <script>
+        let currentPodcast = null;
+        let selectedType = 'idea';
+        let currentUser = null;
+        
+        async function getCurrentUser() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) window.location.href = 'signin.html';
+            currentUser = user;
+        }
+        getCurrentUser();
+        
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                selectedType = card.dataset.type;
+                
+                const contentInput = document.getElementById('content-input');
+                if (selectedType === 'link') {
+                    contentInput.innerHTML = `<label for="content">URL/Link</label><input type="url" id="content" placeholder="https://example.com/article" required>`;
+                } else if (selectedType === 'pdf') {
+                    contentInput.innerHTML = `<label for="content">Upload PDF</label><input type="file" id="content" accept=".pdf" required>`;
+                } else if (selectedType === 'text') {
+                    contentInput.innerHTML = `<label for="content">Text Content</label><textarea id="content" placeholder="Enter your podcast script or content here..."></textarea>`;
+                } else {
+                    contentInput.innerHTML = `<label for="content">Your Idea</label><textarea id="content" placeholder="Describe your podcast idea... What do you want to talk about?"></textarea>`;
+                }
+            });
+        });
+        
+        document.querySelector('.option-card[data-type="idea"]').classList.add('active');
+        
+        const audioAgent = new AudioAgent();
+        
+        const podcastForm = document.getElementById('podcast-form');
+        if (podcastForm) {
+            podcastForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const topic = document.getElementById('topic').value;
+                let content = document.getElementById('content').value;
+                
+                if (selectedType === 'link') {
+                    showToast('URL processing coming soon! Using sample content.', 'info');
+                    content = `Article about ${topic}: This is sample content.`;
+                } else if (selectedType === 'pdf') {
+                    const file = document.getElementById('content').files[0];
+                    if (file) {
+                        showToast('PDF processing coming soon!', 'info');
+                        content = `PDF content about ${topic}`;
+                    }
+                }
+                
+                const hostVoice = document.getElementById('host-voice').value;
+                const guestVoice = document.getElementById('guest-voice').value;
+                
+                const generateBtn = document.querySelector('.generate-btn');
+                generateBtn.textContent = '🔄 Generating...';
+                generateBtn.disabled = true;
+                
+                try {
+                    const script = await audioAgent.generateScript(content, topic);
+                    
+                    currentPodcast = {
+                        id: Date.now(),
+                        topic: topic,
+                        script: script,
+                        hostVoice: hostVoice,
+                        guestVoice: guestVoice,
+                        createdAt: new Date().toISOString(),
+                        type: selectedType
+                    };
+                    
+                    const scriptDiv = document.getElementById('generated-script');
+                    scriptDiv.innerHTML = '<h4>📝 Generated Script:</h4>';
+                    script.forEach((segment, index) => {
+                        scriptDiv.innerHTML += `
+                            <div style="margin: 1rem 0; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 16px;">
+                                <strong style="color: #3b82f6;">${segment.speaker.toUpperCase()}:</strong>
+                                <p style="margin-top: 0.5rem;">${segment.text}</p>
+                                <button onclick="playSegment(${index})" class="btn-outline" style="font-size: 0.8rem; margin-top: 0.5rem;">▶ Play Segment</button>
+                            </div>
+                        `;
+                    });
+                    
+                    document.getElementById('result-section').style.display = 'block';
+                    showToast('Podcast generated successfully!', 'success');
+                    
+                } catch (error) {
+                    showToast(error.message, 'error');
+                } finally {
+                    generateBtn.textContent = '🎙️ Generate Podcast';
+                    generateBtn.disabled = false;
+                }
+            });
+        }
+        
+        window.playSegment = async (index) => {
+            if (currentPodcast) {
+                const segment = currentPodcast.script[index];
+                const voiceId = segment.speaker === 'host' ? currentPodcast.hostVoice : currentPodcast.guestVoice;
+                await audioAgent.generateSpeech(segment.text, voiceId);
+            }
+        };
+        
+        window.savePodcast = async () => {
+            if (currentPodcast && currentUser) {
+                try {
+                    const { error } = await supabase
+                        .from('podcasts')
+                        .insert([{
+                            user_id: currentUser.id,
+                            topic: currentPodcast.topic,
+                            script: currentPodcast.script,
+                            host_voice: currentPodcast.hostVoice,
+                            guest_voice: currentPodcast.guestVoice,
+                            type: currentPodcast.type,
+                            created_at: new Date().toISOString()
+                        }]);
+                    
+                    if (error) throw error;
+                    showToast('✅ Podcast saved to your library!', 'success');
+                } catch (error) {
+                    showToast(error.message, 'error');
+                }
+            }
+        };
+        
+        window.exportPodcast = () => {
+            if (currentPodcast) {
+                const dataStr = JSON.stringify(currentPodcast, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', `${currentPodcast.topic.replace(/\s/g, '_')}.json`);
+                linkElement.click();
+                showToast('Podcast exported successfully!', 'success');
+            }
+        };
+    </script>
+</body>
+</html>

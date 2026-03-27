@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Code — PodCraft AI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    /* إصلاح مشكلة كتابة الكود */
+    #code {
+      font-size: 1.2rem;
+      letter-spacing: 4px;
+      text-align: center;
+      font-weight: bold;
+    }
+    #code:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+  </style>
+</head>
+<body class="auth-page">
+
+  <div style="position:fixed;top:-100px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(147,51,234,0.12) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+  <div style="position:fixed;bottom:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(236,72,153,0.08) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+
+  <div class="auth-container" style="position:relative;z-index:1;">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer; justify-content:center; display:flex; margin-bottom:1.5rem;">
+          <div class="logo-icon">🎙️</div>
+          <h1>PodCraft AI</h1>
+        </div>
+        <h2>Verify Your Email</h2>
+        <p>We've sent a 6-digit verification code to your email. Please enter it below.</p>
+      </div>
+
+      <form id="verify-form" class="auth-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required readonly style="background: rgba(255,255,255,0.02);">
+        </div>
+
+        <div class="form-group">
+          <label for="code">Verification Code</label>
+          <input type="text" id="code" name="code" placeholder="Enter 6-digit code" required maxlength="6" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+          <p style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 0.5rem;">Check your email for the code</p>
+        </div>
+
+        <button type="submit" class="btn-primary btn-block" style="padding:0.9rem; margin-top:1rem; font-size:0.95rem; border-radius:14px;">
+          Verify Code
+        </button>
+      </form>
+
+      <div class="auth-footer" style="margin-top: 1.5rem;">
+        <p><a href="#" id="resend-code">⟳ Resend Code</a></p>
+        <p><a href="forgot-password.html">← Back</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/supabase-config.js"></script>
+  <script>
+    // EmailJS Configuration
+    const EMAILJS_PUBLIC_KEY = 'TRu285qFMLMZxXcQk';
+    const EMAILJS_SERVICE_ID = 'service_podcraft';
+    const EMAILJS_TEMPLATE_ID = 'template_password_reset';
+    
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    
+    function generateOTP() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    let email = urlParams.get('email');
+    
+    const emailInput = document.getElementById('email');
+    if (emailInput && email) {
+      emailInput.value = email;
+    }
+    
+    // السماح بإدخال الأرقام فقط
+    const codeInput = document.getElementById('code');
+    if (codeInput) {
+      codeInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+      });
+    }
+    
+    // إعادة إرسال الكود
+    document.getElementById('resend-code').addEventListener('click', async (e) => {
+      e.preventDefault();
+      
+      if (!email) {
+        showToast('Email not found. Please go back to forgot password page.', 'error');
+        setTimeout(() => {
+          window.location.href = 'forgot-password.html';
+        }, 2000);
+        return;
+      }
+      
+      const otpCode = generateOTP();
+      
+      const resetData = {
+        email: email,
+        code: otpCode,
+        expiresAt: Date.now() + 10 * 60 * 1000
+      };
+      localStorage.setItem('reset_otp', JSON.stringify(resetData));
+      
+      const templateParams = {
+        to_email: email,
+        to_name: email.split('@')[0],
+        code: otpCode
+      };
+      
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+        showToast(`✓ New verification code sent to ${email}!`, 'success');
+      } catch (err) {
+        console.error('Resend error:', err);
+        showToast(`⚠️ Unable to send email. Your new code is: ${otpCode}`, 'info', 10000);
+      }
+    });
+    
+    const verifyForm = document.getElementById('verify-form');
+    
+    verifyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const enteredCode = document.getElementById('code').value.trim();
+      const email = document.getElementById('email').value.trim();
+      
+      if (!enteredCode) {
+        showToast('Please enter the verification code.', 'warning');
+        return;
+      }
+      
+      if (enteredCode.length !== 6) {
+        showToast('Please enter the complete 6-digit code.', 'warning');
+        return;
+      }
+      
+      const storedData = localStorage.getItem('reset_otp');
+      if (!storedData) {
+        showToast('No verification code found. Please request a new code.', 'error');
+        setTimeout(() => {
+          window.location.href = 'forgot-password.html';
+        }, 2000);
+        return;
+      }
+      
+      const { email: storedEmail, code: storedCode, expiresAt } = JSON.parse(storedData);
+      
+      if (Date.now() > expiresAt) {
+        showToast('Verification code has expired. Please request a new one.', 'error');
+        localStorage.removeItem('reset_otp');
+        setTimeout(() => {
+          window.location.href = 'forgot-password.html';
+        }, 2000);
+        return;
+      }
+      
+      if (storedEmail !== email) {
+        showToast('Email mismatch. Please try again.', 'error');
+        return;
+      }
+      
+      if (storedCode !== enteredCode) {
+        showToast('Invalid verification code. Please try again.', 'error');
+        return;
+      }
+      
+      const submitBtn = verifyForm.querySelector('[type="submit"]');
+      submitBtn.textContent = 'Verifying...';
+      submitBtn.disabled = true;
+      
+      localStorage.setItem('reset_verified', JSON.stringify({
+        email: email,
+        verifiedAt: Date.now()
+      }));
+      
+      showToast('✓ Code verified! Please set your new password.', 'success');
+      setTimeout(() => {
+        window.location.href = `update-password.html?email=${encodeURIComponent(email)}`;
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

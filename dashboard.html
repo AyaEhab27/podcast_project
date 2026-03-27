@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dashboard - PodCraft AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <div class="logo-icon">🎙️</div>
+                <h1>PodCraft AI</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="create.html">Create New</a></li>
+                <li><a href="personas.html">Personas</a></li>
+                <li><a href="dashboard.html?tab=library">My Library</a></li>
+                <li><a href="dashboard.html?tab=settings">Settings</a></li>
+            </ul>
+            <div class="nav-buttons" id="nav-buttons">
+                <button onclick="logout()" class="btn-outline">Logout</button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Dashboard</h1>
+            <a href="create.html" class="btn-primary">+ Create New Podcast</a>
+        </div>
+        
+        <div class="agents-grid" style="margin-bottom: 2rem; grid-template-columns: repeat(3, 1fr);">
+            <div class="agent-card">
+                <div class="agent-icon">📊</div>
+                <h3>Total Podcasts</h3>
+                <p id="total-count">0</p>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">⏱️</div>
+                <h3>Total Minutes</h3>
+                <p id="total-minutes">0</p>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">👥</div>
+                <h3>Listeners</h3>
+                <p id="total-listeners">0</p>
+            </div>
+        </div>
+        
+        <div class="result-section">
+            <h3>📚 Recent Podcasts</h3>
+            <div id="recent-podcasts"></div>
+        </div>
+    </div>
+    
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentUser = null;
+        
+        async function initDashboard() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error) {
+                console.error('Error getting user:', error);
+            }
+            if (!user) {
+                window.location.href = 'signin.html';
+                return;
+            }
+            currentUser = user;
+            await loadPodcasts();
+        }
+        
+        async function loadPodcasts() {
+            try {
+                const { data: podcasts, error } = await supabase
+                    .from('podcasts')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                if (error) {
+                    console.error('Error loading podcasts:', error);
+                    return;
+                }
+                
+                document.getElementById('total-count').textContent = podcasts?.length || 0;
+                
+                const container = document.getElementById('recent-podcasts');
+                if (!podcasts || podcasts.length === 0) {
+                    container.innerHTML = '<p>No podcasts yet. <a href="create.html">Create your first podcast!</a></p>';
+                } else {
+                    container.innerHTML = podcasts.map(podcast => `
+                        <div class="podcast-card">
+                            <h4>${podcast.topic}</h4>
+                            <p style="color: #3b82f6;">Created: ${new Date(podcast.created_at).toLocaleDateString()}</p>
+                            <button onclick="viewPodcast(${podcast.id})" class="btn-outline" style="margin-top: 0.5rem;">View Details</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        window.viewPodcast = (id) => {
+            window.location.href = `create.html?id=${id}`;
+        };
+        
+        initDashboard();
+    </script>
+</body>
+</html>

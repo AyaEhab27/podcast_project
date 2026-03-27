@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PodCraft AI — Create Professional Podcasts with AI Agents</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- ====== NAVBAR ====== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <div class="logo" onclick="window.location.href='index.html'">
+        <div class="logo-icon">🎙️</div>
+        <h1>PodCraft AI</h1>
+      </div>
+      <ul class="nav-menu" id="nav-menu">
+        <!-- هيتغير حسب حالة تسجيل الدخول -->
+      </ul>
+      <div class="nav-buttons" id="nav-buttons">
+        <!-- هيتغير حسب حالة تسجيل الدخول -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====== HERO ====== -->
+  <section class="hero">
+    <div class="hero-container">
+      <h1>Create Professional Podcasts</h1>
+      <h2>in Minutes, Not Hours.</h2>
+      <p>Transform any idea, article, or PDF into a polished, publish-ready podcast episode — complete with realistic AI voices, custom cover art, and multi-platform export.</p>
+      <div class="hero-buttons">
+        <a href="signup.html" class="btn-primary btn-large">Get Started Free →</a>
+        <a href="#how-it-works" class="btn-outline btn-large">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== AI AGENTS ====== -->
+  <section class="agents-section" id="features">
+    <div class="container">
+      <div class="agents-header" style="text-align:center; margin-bottom:3rem;">
+        <h2 class="section-title">Powered by Specialized AI Agents</h2>
+        <p class="section-subtitle" style="margin:0 auto; color: rgba(255,255,255,0.7);">Each agent handles one task with precision — together they produce studio-quality content.</p>
+      </div>
+      <div class="agents-grid">
+        <div class="agent-card" onclick="window.location.href='signup.html'">
+          <div class="agent-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <h3>Content Agent</h3>
+          <p>Analyzes URLs, PDFs, or raw text to extract key insights and structure podcast-ready content.</p>
+        </div>
+        <div class="agent-card" onclick="window.location.href='signup.html'">
+          <div class="agent-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+          </div>
+          <h3>Script Agent</h3>
+          <p>Writes natural, engaging dialogue between host and guest with proper conversational flow.</p>
+        </div>
+        <div class="agent-card" onclick="window.location.href='signup.html'">
+          <div class="agent-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 18v-6a9 9 0 0118 0v6"/>
+              <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
+            </svg>
+          </div>
+          <h3>Audio Agent</h3>
+          <p>Generates realistic, expressive voices with persona-matched speaking styles for each character.</p>
+        </div>
+        <div class="agent-card" onclick="window.location.href='signup.html'">
+          <div class="agent-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </div>
+          <h3>Cover Agent</h3>
+          <p>Generates custom podcast cover art at multiple sizes optimized for each publishing platform.</p>
+        </div>
+        <div class="agent-card" onclick="window.location.href='signup.html'">
+          <div class="agent-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polygon points="23 7 16 12 23 17 23 7"/>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+          </div>
+          <h3>Video Agent</h3>
+          <p>Combines audio and cover art into a shareable video — formatted for YouTube, Reels, or TikTok.</p>
+        </div>
+        <div class="agent-card" onclick="window.location.href='signup.html'">
+          <div class="agent-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <h3>Publish Agent</h3>
+          <p>Connects your accounts and distributes your podcast to Spotify, YouTube, and more automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== HOW IT WORKS - Vertical Timeline ====== -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <h2 class="section-title" style="text-align:center;">From Idea to Published in 4 Steps</h2>
+
+      <div class="timeline-vertical">
+        <div class="timeline-item-vertical left">
+          <div class="timeline-content-vertical">
+            <div class="timeline-number-vertical">1</div>
+            <h3>Input Your Content</h3>
+            <p>Upload a PDF, paste a URL, or just describe your idea. Our Content Agent extracts all the key insights automatically.</p>
+          </div>
+        </div>
+        
+        <div class="timeline-item-vertical right">
+          <div class="timeline-content-vertical">
+            <div class="timeline-number-vertical">2</div>
+            <h3>Choose Your Personas</h3>
+            <p>Select voices and personalities for your host and guest. Each persona has a distinct speaking style and tone.</p>
+          </div>
+        </div>
+        
+        <div class="timeline-item-vertical left">
+          <div class="timeline-content-vertical">
+            <div class="timeline-number-vertical">3</div>
+            <h3>Generate Your Podcast</h3>
+            <p>AI writes the script, produces the audio, and creates your cover art — all in under 5 minutes.</p>
+          </div>
+        </div>
+        
+        <div class="timeline-item-vertical right">
+          <div class="timeline-content-vertical">
+            <div class="timeline-number-vertical">4</div>
+            <h3>Publish Everywhere</h3>
+            <p>Export in the right format for any platform. Connect your accounts to publish with one click.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:3rem;">
+        <a href="signup.html" class="btn-primary btn-large">Try It Free →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FOOTER ====== -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h3>PodCraft AI</h3>
+          <p>Transform your ideas into professional podcast episodes with AI-powered multi-agent production.</p>
+          <div class="stay-updated">
+            <h4>Stay Updated</h4>
+            <form id="newsletter-form">
+              <input type="email" placeholder="your@email.com" required>
+              <button type="submit">Subscribe</button>
+            </form>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="create.html">Create Podcast</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="#features">AI Agents</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Team</h4>
+          <ul>
+            <li><a href="#">Aya Ehab </a></li>
+            <li><a href="#">Aliaa Abdelwahab</a></li>
+            <li><a href="#">Asmaa Ibrahim</a></li>
+            <li><a href="#"> Mariam Maged</a></li>
+            <li><a href="#"> Noor Waleed</a></li>
+
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 PodCraft AI · Built with ❤️ at DEPI</p>
+        <div class="social-links">
+          <a href="#" title="X / Twitter">𝕏</a>
+          <a href="#" title="GitHub">⌨</a>
+          <a href="#" title="YouTube">▶</a>
+          <a href="#" title="LinkedIn">🔗</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 20) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>
