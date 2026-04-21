@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personas Studio - PodCraft AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: white;
+        }
+        .personas-studio {
+            max-width: 1400px;
+            margin: 100px auto 0;
+            padding: 2rem;
+        }
+        .studio-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .persona-card {
+            background: rgba(20, 20, 30, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 2rem;
+        }
+        .persona-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .persona-header h2 {
+            font-size: 1.5rem;
+        }
+        .badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .style-buttons, .gender-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .style-btn, .gender-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .style-btn:hover, .gender-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .style-btn.active, .gender-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: transparent;
+        }
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .speed-control input {
+            flex: 1;
+        }
+        .speed-value {
+            min-width: 45px;
+            text-align: center;
+            background: rgba(59,130,246,0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+        }
+        .preview-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+        .preview-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16,185,129,0.3);
+        }
+        .audio-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.5);
+            border-radius: 12px;
+            display: none;
+        }
+        .audio-preview.show {
+            display: block;
+        }
+        audio {
+            width: 100%;
+        }
+        .status {
+            font-size: 0.8rem;
+            color: #3b82f6;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 0.5rem 0;
+            color: #3b82f6;
+        }
+        .loading.show {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .studio-grid {
+                grid-template-columns: 1fr;
+            }
+            .personas-studio {
+                padding: 1rem;
+                margin-top: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <div class="logo-icon">🎙️</div>
+                <h1>PodCraft AI</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="create.html">Create New</a></li>
+                <li><a href="personas.html" class="active">Personas</a></li>
+                <li><a href="dashboard.html">My Library</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="personas-studio">
+        <div class="studio-grid">
+            <!-- HOST Card -->
+            <div class="persona-card">
+                <div class="persona-header">
+                    <h2>🎙️ HOST</h2>
+                    <span class="badge">المذيع</span>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 Name</label>
+                    <input type="text" id="host-name" placeholder="Enter host name" value="Ahmed">
+                </div>
+
+                <div class="form-group">
+                    <label>🌐 Language</label>
+                    <select id="host-language">
+                        <option value="en">English 🇺🇸</option>
+                        <option value="ar">Arabic 🇪🇬</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="host-dialect-group">
+                    <label>🗣️ Dialect (for Arabic)</label>
+                    <select id="host-dialect">
+                        <option value="egyptian">🇪🇬 Egyptian (gTTS - Free)</option>
+                        <option value="saudi">🇸🇦 Saudi (Munsit)</option>
+                        <option value="hijazi">🇸🇦 Hijazi (Munsit)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🎨 Voice Style</label>
+                    <div class="style-buttons" id="host-styles">
+                        <!-- هتتعبأ ديناميكياً حسب اللهجة -->
+                    </div>
+                    <input type="hidden" id="host-style" value="professional">
+                </div>
+
+                <div class="form-group">
+                    <label>👤 Gender</label>
+                    <div class="gender-buttons" id="host-gender">
+                        <div class="gender-btn active" data-gender="male">Male 👨</div>
+                        <div class="gender-btn" data-gender="female">Female 👩</div>
+                    </div>
+                    <input type="hidden" id="host-gender-value" value="male">
+                </div>
+
+                <div class="form-group">
+                    <label>⚡ Speaking Speed <span style="color:#3b82f6;">(you control this)</span></label>
+                    <div class="speed-control">
+                        <span>🐢 0.5x</span>
+                        <input type="range" id="host-speed" min="0.5" max="2.0" step="0.05" value="1.0">
+                        <span id="host-speed-value" class="speed-value">1.0x</span>
+                        <span>🐇 2.0x</span>
+                    </div>
+                </div>
+
+                <button class="preview-btn" onclick="previewVoice('host')">🔊 Preview Voice</button>
+                <div id="host-preview" class="audio-preview">
+                    <audio id="host-audio" controls></audio>
+                    <div id="host-status" class="status"></div>
+                </div>
+                <div id="host-loading" class="loading">🔄 Generating preview...</div>
+            </div>
+
+            <!-- GUEST Card -->
+            <div class="persona-card">
+                <div class="persona-header">
+                    <h2>👤 GUEST</h2>
+                    <span class="badge">الضيف</span>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 Name</label>
+                    <input type="text" id="guest-name" placeholder="Enter guest name" value="Sara">
+                </div>
+
+                <div class="form-group">
+                    <label>🌐 Language</label>
+                    <select id="guest-language">
+                        <option value="en">English 🇺🇸</option>
+                        <option value="ar">Arabic 🇪🇬</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="guest-dialect-group">
+                    <label>🗣️ Dialect (for Arabic)</label>
+                    <select id="guest-dialect">
+                        <option value="egyptian">🇪🇬 Egyptian (gTTS - Free)</option>
+                        <option value="saudi">🇸🇦 Saudi (Munsit)</option>
+                        <option value="hijazi">🇸🇦 Hijazi (Munsit)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🎨 Voice Style</label>
+                    <div class="style-buttons" id="guest-styles">
+                        <!-- هتتعبأ ديناميكياً حسب اللهجة -->
+                    </div>
+                    <input type="hidden" id="guest-style" value="warm">
+                </div>
+
+                <div class="form-group">
+                    <label>👤 Gender</label>
+                    <div class="gender-buttons" id="guest-gender">
+                        <div class="gender-btn" data-gender="male">Male 👨</div>
+                        <div class="gender-btn active" data-gender="female">Female 👩</div>
+                    </div>
+                    <input type="hidden" id="guest-gender-value" value="female">
+                </div>
+
+                <div class="form-group">
+                    <label>⚡ Speaking Speed <span style="color:#3b82f6;">(you control this)</span></label>
+                    <div class="speed-control">
+                        <span>🐢 0.5x</span>
+                        <input type="range" id="guest-speed" min="0.5" max="2.0" step="0.05" value="1.0">
+                        <span id="guest-speed-value" class="speed-value">1.0x</span>
+                        <span>🐇 2.0x</span>
+                    </div>
+                </div>
+
+                <button class="preview-btn" onclick="previewVoice('guest')">🔊 Preview Voice</button>
+                <div id="guest-preview" class="audio-preview">
+                    <audio id="guest-audio" controls></audio>
+                    <div id="guest-status" class="status"></div>
+                </div>
+                <div id="guest-loading" class="loading">🔄 Generating preview...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000';
+
+        // ========== تعريف الستايلات لكل لهجة ==========
+        const DIALECT_CONFIG = {
+            "saudi": {
+                "styles": ["professional", "calm"],
+                "male_voice": "ar-najdi-male-2",
+                "female_voice": "ar-najdi-female-1"
+            },
+            "hijazi": {
+                "styles": ["warm"],
+                "male_voice": null,
+                "female_voice": "ar-hijazi-female-1"
+            },
+            "egyptian": {
+                "styles": [],
+                "male_voice": null,
+                "female_voice": null
+            }
+        };
+
+        const STYLE_NAMES = {
+            "professional": "Professional",
+            "calm": "Calm",
+            "warm": "Warm",
+            "energetic": "Energetic",
+            "authoritative": "Authoritative",
+            "clear": "Clear",
+            "natural": "Natural"
+        };
+
+        // تحديث أزرار الستايل حسب اللهجة المختارة
+        function updateStyleButtons(type) {
+            const dialect = document.getElementById(`${type}-dialect`).value;
+            const config = DIALECT_CONFIG[dialect] || { styles: ["professional"] };
+            const availableStyles = config.styles;
+            const container = document.getElementById(`${type}-styles`);
+            const currentStyle = document.getElementById(`${type}-style`).value;
+            
+            container.innerHTML = '';
+            
+            if (availableStyles.length === 0) {
+                const btn = document.createElement('div');
+                btn.className = 'style-btn active';
+                btn.setAttribute('data-style', 'professional');
+                btn.textContent = 'Professional';
+                btn.onclick = () => {
+                    container.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(`${type}-style`).value = 'professional';
+                };
+                container.appendChild(btn);
+            } else {
+                availableStyles.forEach(style => {
+                    const btn = document.createElement('div');
+                    btn.className = 'style-btn';
+                    if (style === currentStyle) btn.classList.add('active');
+                    btn.setAttribute('data-style', style);
+                    btn.textContent = STYLE_NAMES[style] || style;
+                    btn.onclick = () => {
+                        container.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.getElementById(`${type}-style`).value = style;
+                    };
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        // الحصول على voice_id المناسب
+        function getVoiceId(type) {
+            const language = document.getElementById(`${type}-language`).value;
+            if (language !== 'ar') return null;
+            
+            const dialect = document.getElementById(`${type}-dialect`).value;
+            const gender = document.getElementById(`${type}-gender-value`).value;
+            const config = DIALECT_CONFIG[dialect];
+            
+            if (!config) return null;
+            
+            if (gender === 'male') {
+                return config.male_voice;
+            } else {
+                return config.female_voice;
+            }
+        }
+
+        // إظهار/إخفاء اختيار اللهجة حسب اللغة
+        function toggleDialect(type) {
+            const language = document.getElementById(`${type}-language`).value;
+            const dialectGroup = document.getElementById(`${type}-dialect-group`);
+            if (language === 'ar') {
+                dialectGroup.style.display = 'block';
+                updateStyleButtons(type);
+            } else {
+                dialectGroup.style.display = 'none';
+                const container = document.getElementById(`${type}-styles`);
+                container.innerHTML = '';
+                const styles = ["professional", "energetic", "calm", "warm", "authoritative", "clear", "natural"];
+                const currentStyle = document.getElementById(`${type}-style`).value;
+                styles.forEach(style => {
+                    const btn = document.createElement('div');
+                    btn.className = 'style-btn';
+                    if (style === currentStyle) btn.classList.add('active');
+                    btn.setAttribute('data-style', style);
+                    btn.textContent = STYLE_NAMES[style] || style;
+                    btn.onclick = () => {
+                        container.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.getElementById(`${type}-style`).value = style;
+                    };
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        // تهيئة أزرار الجنس
+        function initGenderButtons(containerId, inputId) {
+            const container = document.getElementById(containerId);
+            const input = document.getElementById(inputId);
+            if (!container || !input) return;
+            container.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    input.value = btn.dataset.gender;
+                    const type = containerId.replace('-gender', '');
+                    updateStyleButtons(type);
+                });
+            });
+        }
+
+        initGenderButtons('host-gender', 'host-gender-value');
+        initGenderButtons('guest-gender', 'guest-gender-value');
+
+        // مراقبة تغيير اللغة واللهجة
+        document.getElementById('host-language').addEventListener('change', () => toggleDialect('host'));
+        document.getElementById('guest-language').addEventListener('change', () => toggleDialect('guest'));
+        document.getElementById('host-dialect').addEventListener('change', () => updateStyleButtons('host'));
+        document.getElementById('guest-dialect').addEventListener('change', () => updateStyleButtons('guest'));
+        
+        toggleDialect('host');
+        toggleDialect('guest');
+
+        // تحديث عرض السرعة
+        document.getElementById('host-speed').addEventListener('input', function() {
+            document.getElementById('host-speed-value').textContent = this.value + 'x';
+        });
+        document.getElementById('guest-speed').addEventListener('input', function() {
+            document.getElementById('guest-speed-value').textContent = this.value + 'x';
+        });
+
+        async function previewVoice(type) {
+            const name = document.getElementById(`${type}-name`).value;
+            const text = `Hello, this is ${name}. Welcome to PodCraft AI podcast!`;
+            const language = document.getElementById(`${type}-language`).value;
+            const dialect = language === 'ar' ? document.getElementById(`${type}-dialect`).value : 'egyptian';
+            const style = document.getElementById(`${type}-style`).value;
+            const gender = document.getElementById(`${type}-gender-value`).value;
+            const speed = parseFloat(document.getElementById(`${type}-speed`).value);
+            const voice_id = getVoiceId(type);
+
+            const loading = document.getElementById(`${type}-loading`);
+            const previewDiv = document.getElementById(`${type}-preview`);
+            const audioPlayer = document.getElementById(`${type}-audio`);
+            const statusDiv = document.getElementById(`${type}-status`);
+
+            loading.classList.add('show');
+            previewDiv.classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_URL}/generate-audio`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        persona: type,
+                        name: name,
+                        language: language,
+                        gender: gender,
+                        dialect: dialect,
+                        style: style,
+                        speed: speed,
+                        voice_id: voice_id
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.audio_url) {
+                    audioPlayer.src = data.audio_url;
+                    previewDiv.classList.add('show');
+                    const providerIcon = data.provider === 'elevenlabs' ? '🎙️' : (data.provider === 'munsit' ? '🎯' : '🆓');
+                    const dialectInfo = data.dialect ? ` (${data.dialect})` : '';
+                    statusDiv.innerHTML = `${providerIcon} ${data.voice}${dialectInfo} | Style: ${data.style} | Speed: ${speed}x | Duration: ${data.duration?.toFixed(1) || '?'}s`;
+                    audioPlayer.play();
+                } else {
+                    statusDiv.innerHTML = '❌ Failed: ' + (data.error || 'Unknown error');
+                    previewDiv.classList.add('show');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '❌ Cannot connect to server. Make sure python app.py is running on port 8000!';
+                previewDiv.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
